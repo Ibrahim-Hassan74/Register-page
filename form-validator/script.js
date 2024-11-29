@@ -4,38 +4,43 @@ const email = document.getElementById('email');
 const password = document.getElementById('password');
 const password2 = document.getElementById('password2');
 const phoneNumber = document.getElementById('phone-number');
-const url = 'https://localhost/bikeregister/register.php';
+const button = document.getElementById('btn-submit');
 
-function sendHttpsRequest(method, url, date) {
-  form.addEventListener('submit', async function (event) {
-    event.preventDefault();
-
-    // const formData = new FormData(form);
-
-    try {
-      const response = await fetch(url, {
+async function sendHttpsRequest(method, data) {
+  try {
+    const response = await fetch(
+      'https://localhost/Bike-store/auth/register.php',
+      {
         method: 'POST',
-        body: date,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        body: data,
       }
+    );
 
-      const result = await response.text();
-      console.log('Success:', result);
+    // if (!response.ok) {
+    //   throw new Error(`HTTP error! status: ${response.status}`);
+    // }
 
-      if (result.includes('success')) {
-        console.log('Success:', result);
-        // window.location.href = 'index.php?loginmsg=hello';
-      } else {
-        console.log('Error:', result.error);
-        alert(result.error);
-      }
-    } catch (error) {
-      console.log('Error:', error.message);
+    const result = await response.json();
+    // console.log(result);
+
+    if (response.status === 200) {
+      showSuccess(button);
+      form.reset();
+    } else {
+      showError(button, 'Invalid Email or Password');
+      // console.log('Error from else :', result.error);
     }
-  });
+    // console.log('text:', result);
+
+    // if (result.includes('Successful')) {
+    //   console.log('Success:', result);
+    // } else {
+    //   console.log('Error:', result.error);
+    //   alert(result.error);
+    // }
+  } catch (error) {
+    console.log('Error:', error.message);
+  }
 }
 
 // Show input error message
@@ -111,7 +116,6 @@ function checkPasswordsMatch(input1, input2) {
 function getFieldName(input) {
   return input.id.charAt(0).toUpperCase() + input.id.slice(1);
 }
-
 // Event listeners
 form.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -124,11 +128,11 @@ form.addEventListener('submit', function (e) {
     checkPasswordsMatch(password, password2);
   if (ok) {
     const fd = new FormData(form);
-    sendHttpsRequest('POST', url, fd);
+    sendHttpsRequest('POST', fd);
     const arr = [username, email, password, password2, phoneNumber];
     arr.forEach(function (input) {
       input.parentElement.className = 'form-control';
     });
-    form.reset();
+    // form.reset();
   }
 });
