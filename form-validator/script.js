@@ -25,6 +25,10 @@ async function sendHttpsRequest(method, data) {
 
     if (response.status === 200) {
       showSuccess(button);
+      const arr = [username, email, password, password2, phoneNumber];
+      arr.forEach(function (input) {
+        input.parentElement.className = 'form-control';
+      });
       form.reset();
     } else {
       showError(button, 'Invalid Email or Password');
@@ -129,10 +133,6 @@ form.addEventListener('submit', function (e) {
   if (ok) {
     const fd = new FormData(form);
     sendHttpsRequest('POST', fd);
-    const arr = [username, email, password, password2, phoneNumber];
-    arr.forEach(function (input) {
-      input.parentElement.className = 'form-control';
-    });
     // form.reset();
   }
 });
