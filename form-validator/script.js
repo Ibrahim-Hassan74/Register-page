@@ -3,31 +3,39 @@ const username = document.getElementById('username');
 const email = document.getElementById('email');
 const password = document.getElementById('password');
 const password2 = document.getElementById('password2');
-const url = '';
+const phoneNumber = document.getElementById('phone-number');
+const url = 'https://localhost/bikeregister/register.php';
 
 function sendHttpsRequest(method, url, date) {
-  return fetch(url, {
-    method: method,
-    body: JSON.stringify(date),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then((response) => {
-      if (response.status >= 200 && response.status < 300) {
-        return response.json();
-      } else {
-        response.json().then((errDate) => {
-          console.log(errDate);
-          throw new Error(
-            `some thing is wrong server side: ${response.status}`
-          );
-        });
+  form.addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    // const formData = new FormData(form);
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: date,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    })
-    .catch((error) => {
-      throw new Error(error.message);
-    });
+
+      const result = await response.text();
+      console.log('Success:', result);
+
+      if (result.includes('success')) {
+        console.log('Success:', result);
+        // window.location.href = 'index.php?loginmsg=hello';
+      } else {
+        console.log('Error:', result.error);
+        alert(result.error);
+      }
+    } catch (error) {
+      console.log('Error:', error.message);
+    }
+  });
 }
 
 // Show input error message
@@ -109,20 +117,18 @@ form.addEventListener('submit', function (e) {
   e.preventDefault();
 
   let ok =
-    checkRequired([username, email, password, password2]) &&
+    checkRequired([username, email, password, password2, phoneNumber]) &&
     checkLength(username, 3, 15) &&
     checkLength(password, 6, 25) &&
     checkEmail(email) &&
     checkPasswordsMatch(password, password2);
   if (ok) {
-    let usernameValue = username.value;
-    let emailValue = email.value;
-    let passwordValue = password.value;
-    const post = {
-      username: usernameValue,
-      email: emailValue,
-      password: passwordValue,
-    };
-    sendHttpsRequest('POST', url, post);
+    const fd = new FormData(form);
+    sendHttpsRequest('POST', url, fd);
+    const arr = [username, email, password, password2, phoneNumber];
+    arr.forEach(function (input) {
+      input.parentElement.className = 'form-control';
+    });
+    form.reset();
   }
 });
